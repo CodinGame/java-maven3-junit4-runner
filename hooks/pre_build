@@ -1,0 +1,7 @@
+#!/bin/bash
+echo "=> Building the junit runner jar file"
+docker run -ti --rm \
+    -v $(pwd):/usr/src/junit-runner \
+    -w /usr/src/junit-runner \
+    maven:3 \
+    mvn clean package
