@@ -10,7 +10,7 @@ find * -name "*.java" -print0 | xargs -0 /usr/src/codingame/java-compiler/cgjava
 compilationExitCode=$?
 
 if [ $compilationExitCode -eq 0 ]; then
-	java -cp "/project/workspace:$classpath:/usr/src/codingame/junit-runner/junit-runner.jar" -Dcodingame.junit-runner.output=/project/results/executions.json com.codingame.codemachine.JUnitTestListRunner $*
+	java -cp "/project/workspace:$classpath:/usr/src/codingame/junit-runner/junit-runner.jar" -Dcodingame.junit-runner.output=/project/results/executions.json com.codingame.codemachine.runner.junit.JUnitTestListRunner $*
 	executionExitCode=$?
 fi
 
