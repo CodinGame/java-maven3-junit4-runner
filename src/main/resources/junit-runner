@@ -1,0 +1,19 @@
+#!/bin/bash
+compilationExitCode=0
+executionExitCode=0
+
+cd /project/answer
+
+classpath=$(echo /project/target/*.jar | tr ' ' ':')
+
+find * -name "*.java" -print0 | xargs -0 /usr/src/codingame/java-compiler/cgjavac -Xlint:all -cp "$classpath" -d /project/workspace
+compilationExitCode=$?
+
+if [ $compilationExitCode -eq 0 ]; then
+	java -cp "/project/workspace:$classpath:/usr/src/codingame/junit-runner/junit-runner.jar" -Dcodingame.junit-runner.output=/project/results/executions.json com.codingame.codemachine.JUnitTestListRunner $*
+	executionExitCode=$?
+fi
+
+success=$((compilationExitCode + executionExitCode))
+
+exit $success
