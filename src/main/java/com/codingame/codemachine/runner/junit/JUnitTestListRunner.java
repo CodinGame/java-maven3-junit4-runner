@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 import static java.util.Collections.singletonList;
 
 public class JUnitTestListRunner {
-    private static final String DEFAULT_OUTPUT = "/project/results/executions.json";
+    private static final String DEFAULT_OUTPUT = "-";
 
     private static RunLogDto parseThrowable(Throwable t) {
         RunLogDto runLog = new RunLogDto();
@@ -147,7 +147,7 @@ public class JUnitTestListRunner {
 
         String resultOutput = System.getProperty("codingame.junit-runner.output", DEFAULT_OUTPUT);
         String resultStr = new Gson().toJson(results);
-        if ("-".equals(resultOutput)) {
+        if (DEFAULT_OUTPUT.equals(resultOutput)) {
             realOut.println(resultStr);
         }
         else {
