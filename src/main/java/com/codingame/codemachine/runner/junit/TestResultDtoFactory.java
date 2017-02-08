@@ -30,15 +30,10 @@ class TestResultDtoFactory {
         return runLog;
     }
 
-    TestResultDto create(boolean success, Description description, Throwable t) {
+    TestResultDto create(boolean success, Throwable t) {
         TestResultDto result = new TestResultDto();
         result.setSuccess(success);
         result.setNotFound(false);
-        String testReference = description.getClassName();
-        if (description.getMethodName() != null) {
-            testReference += "#" + description.getMethodName();
-        }
-        result.setTestReference(testReference);
         if (t != null) {
             result.setLogs(singletonList(parseThrowable(t)));
         }
