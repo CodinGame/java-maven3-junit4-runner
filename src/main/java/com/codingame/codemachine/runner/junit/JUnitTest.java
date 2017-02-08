@@ -11,19 +11,17 @@ import org.junit.runner.Runner;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class JUnitTest {
+class JUnitTest {
     private static final String DEFAULT_OUTPUT = "-";
     private static final Pattern COMMAND_PATTERN = Pattern.compile("(?<class>[^#]+)(?:#(?<method>[^#]+))?");
 
     private final PrintStream realOut;
     private final PrintStream realErr;
     private final JUnitCore jUnitCore;
-    private List<TestResultDto> results;
+    private TestResultDto result;
     private boolean oneFailure;
 
     JUnitTest() {
@@ -33,13 +31,13 @@ public class JUnitTest {
         oneFailure = false;
     }
 
-    boolean isOneFailure() {
+    private boolean isOneFailure() {
         return this.oneFailure;
     }
 
-    int run(String... args) {
-        List<TestCase> testCases = findRequests(args);
-        runTestCases(testCases);
+    int run(String testcaseSpecification) {
+        TestCase testCase = findRequest(testcaseSpecification);
+        runTestCase(testCase);
 
         int statusCode = isOneFailure() ? 1 : 0;
         statusCode = generateResult() ? statusCode : 3;
@@ -47,59 +45,51 @@ public class JUnitTest {
         return statusCode;
     }
 
-    List<TestCase> findRequests(String... args) {
-        List<TestCase> requests = new ArrayList<>();
-        for (String arg : args) {
-            Matcher matcher = COMMAND_PATTERN.matcher(arg);
-            if (matcher.matches()) {
-                try {
-                    Class<?> clazz = Class.forName(matcher.group("class"));
-                    String method = matcher.group("method");
-                    if (method != null) {
-                        requests.add(TestCase.createTestCase(Request.method(clazz, method), arg));
-                    }
-                    else {
-                        requests.add(TestCase.createTestCase(Request.aClass(clazz), arg));
-                    }
+    TestCase findRequest(String testcaseSpecification) {
+        TestCase request = null;
+        Matcher matcher = COMMAND_PATTERN.matcher(testcaseSpecification);
+        if (matcher.matches()) {
+            try {
+                Class<?> clazz = Class.forName(matcher.group("class"));
+                String method = matcher.group("method");
+                if (method != null) {
+                    request = TestCase.createTestCase(Request.method(clazz, method), testcaseSpecification);
                 }
-                catch (ClassNotFoundException ignored) {
-                    requests.add(TestCase.createTestCase());
+                else {
+                    request = TestCase.createTestCase(Request.aClass(clazz), testcaseSpecification);
                 }
             }
+            catch (ClassNotFoundException ignored) {
+                request = TestCase.createTestCase();
+            }
         }
-        return requests;
-    }
-
-    void runTestCases(List<TestCase> testCases) {
-        results = new ArrayList<>();
-        jUnitCore.addListener(new TestResultProvider(results));
-
-        testCases.forEach(this::runTestCase);
+        return request;
     }
 
     private void runTestCase(TestCase testCase) {
         if (testCase.exists()) {
+            result = new TestResultDto();
+            jUnitCore.addListener(new TestResultProvider(result));
             if (!testCase.run(jUnitCore)) {
                 oneFailure = true;
             }
         }
         else {
-            results.add(createTestNotFoundResult(testCase.description()));
+            result = createTestNotFoundResult();
             oneFailure = true;
         }
     }
 
-    private TestResultDto createTestNotFoundResult(String testReference) {
+    private TestResultDto createTestNotFoundResult() {
         TestResultDto result = new TestResultDto();
         result.setSuccess(false);
         result.setNotFound(true);
-        result.setTestReference(testReference);
         return result;
     }
 
     private boolean generateResult() {
         String resultOutput = System.getProperty("codingame.junit-runner.output", DEFAULT_OUTPUT);
-        String resultStr = new Gson().toJson(results);
+        String resultStr = new Gson().toJson(result);
         if (DEFAULT_OUTPUT.equals(resultOutput)) {
             realOut.println(resultStr);
         }

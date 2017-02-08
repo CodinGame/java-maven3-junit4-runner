@@ -7,22 +7,22 @@ import org.junit.runner.notification.RunListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.List;
 
 public class TestResultProvider extends RunListener {
     private final TestResultDtoFactory testResultDtoFactory;
-    private final List<TestResultDto> results;
+    private final TestResultDto result;
 
     private ByteArrayOutputStream out;
     private ByteArrayOutputStream err;
     private TestResultDto currentResult;
 
-    TestResultProvider(List<TestResultDto> results) {
-        this(results, null);
+    TestResultProvider(TestResultDto result) {
+        this(result, null);
     }
 
-    TestResultProvider(List<TestResultDto> results, TestResultDtoFactory testResultDtoFactory) {
-        this.results = results;
+    TestResultProvider(TestResultDto result, TestResultDtoFactory testResultDtoFactory) {
+        this.result = result;
+        this.result.setSuccess(true);
         this.testResultDtoFactory = testResultDtoFactory != null ? testResultDtoFactory : new TestResultDtoFactory();
     }
 
@@ -35,16 +35,17 @@ public class TestResultProvider extends RunListener {
     }
 
     public void testFailure(Failure failure) {
-        currentResult = testResultDtoFactory.create(false, failure.getDescription(), failure.getException());
+        currentResult = testResultDtoFactory.create(false, failure.getException());
     }
 
     public void testFinished(Description description) throws Exception {
         if (currentResult == null) {
-            currentResult = testResultDtoFactory.create(true, description, null);
+            currentResult = testResultDtoFactory.create(true, null);
         }
-        currentResult.setProgramStderr(new String(err.toByteArray()));
-        currentResult.setProgramStdout(new String(out.toByteArray()));
-        results.add(currentResult);
+        result.appendStderr(new String(err.toByteArray()));
+        result.appendStdout(new String(out.toByteArray()));
+        result.appendLogs(currentResult.getLogs());
+        result.setSuccess(result.isSuccess() && currentResult.isSuccess());
         err.close();
         out.close();
     }
