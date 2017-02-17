@@ -1,46 +1,26 @@
 package com.codingame.codemachine.runner.junit;
 
-import com.codingame.codemachine.runner.junit.core.TestResultDto;
-import com.google.gson.Gson;
-import org.apache.commons.io.FileUtils;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.junit.internal.runners.ErrorReportingRunner;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
 import org.junit.runner.Runner;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 class JUnitTest {
-    private static final String DEFAULT_OUTPUT = "-";
     private static final Pattern COMMAND_PATTERN = Pattern.compile("(?<class>[^#]+)(?:#(?<method>[^#]+))?");
 
-    private final PrintStream realOut;
-    private final PrintStream realErr;
     private final JUnitCore jUnitCore;
-    private TestResultDto result;
-    private boolean oneFailure;
+    private int statusCode;
 
     JUnitTest() {
-        realOut = System.out;
-        realErr = System.err;
         jUnitCore = new JUnitCore();
-        oneFailure = false;
-    }
-
-    private boolean isOneFailure() {
-        return this.oneFailure;
     }
 
     int run(String testcaseSpecification) {
         TestCase testCase = findRequest(testcaseSpecification);
         runTestCase(testCase);
-
-        int statusCode = isOneFailure() ? 1 : 0;
-        statusCode = generateResult() ? statusCode : 3;
 
         return statusCode;
     }
@@ -68,45 +48,20 @@ class JUnitTest {
 
     private void runTestCase(TestCase testCase) {
         if (testCase.exists()) {
-            result = new TestResultDto();
-            jUnitCore.addListener(new TestResultProvider(result));
-            if (!testCase.run(jUnitCore)) {
-                oneFailure = true;
+            jUnitCore.addListener(new TestResultFormatter());
+            if (testCase.run(jUnitCore)) {
+                statusCode = 0;
+            } else {
+                statusCode = 1;
             }
         }
         else {
-            result = createTestNotFoundResult();
-            oneFailure = true;
+            statusCode = 2;
+            System.err.println("Testcase not found \""+ testCase.description() + "\"");
         }
-    }
-
-    private TestResultDto createTestNotFoundResult() {
-        TestResultDto result = new TestResultDto();
-        result.setSuccess(false);
-        result.setNotFound(true);
-        return result;
-    }
-
-    private boolean generateResult() {
-        String resultOutput = System.getProperty("codingame.junit-runner.output", DEFAULT_OUTPUT);
-        String resultStr = new Gson().toJson(result);
-        if (DEFAULT_OUTPUT.equals(resultOutput)) {
-            realOut.println(resultStr);
-        }
-        else {
-            try {
-                FileUtils.writeStringToFile(new File(resultOutput), resultStr);
-            }
-            catch (IOException e) {
-                realErr.println(e.getMessage());
-                return false;
-            }
-        }
-        return true;
     }
 
     static class TestCase {
-
         static TestCase createTestCase() {
             return new TestCase(null, null);
         }
