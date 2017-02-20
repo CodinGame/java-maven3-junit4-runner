@@ -1,8 +1,10 @@
 package com.codingame.codemachine.runner.junit;
 
-import com.codingame.codemachine.runner.junit.JUnitTest.TestCase;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.Description;
+import org.junit.runner.Request;
+import org.junit.runner.Runner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,8 +26,8 @@ public class TestJunitTest {
     @Test
     public void should_not_find_test_class_if_it_does_not_exist() throws ClassNotFoundException {
         String className = "unknown.ClassTest";
-        TestCase testCase = jUnitTest.findRequest(className);
-        assertThat(testCase.exists()).isFalse();
+        Request request = jUnitTest.findRequest(className);
+        assertThat(request).isNull();
     }
 
     @Test
@@ -46,29 +48,31 @@ public class TestJunitTest {
     public void does_not_work_with_parameterized_test_class() {
         String className = "resources.parameterized.com.codingame.core.FibonacciTest";
         String methodName = "test";
-        TestCase testCase = jUnitTest.findRequest(className + "#" + methodName);
-        assertThat(testCase).isNotNull();
-        assertThat(testCase.exists()).isFalse();
+        Request request = jUnitTest.findRequest(className + "#" + methodName);
+        assertThat(request).isNotNull();
+        assertThat(request.getRunner().getDescription().getChildren().get(0).getDisplayName()).startsWith("initializationError");
     }
 
     private void checkTestCase(String className) throws ClassNotFoundException {
-        TestCase testCase = jUnitTest.findRequest(className);
-        assertThat(testCase).isNotNull();
+        Request request = jUnitTest.findRequest(className);
+
+        assertThat(request).isNotNull();
+        assertThat(request.getRunner().getDescription().getDisplayName()).isEqualTo(className);
 
         Class<?> clazz = Class.forName(className);
         int expectedTestCount = clazz.getDeclaredMethods().length;
-        assertThat(testCase.exists()).isTrue();
-        assertThat(testCase.description()).isEqualTo(className);
-        int testCount = testCase.request().getRunner().testCount();
+        int testCount = request.getRunner().testCount();
         assertThat(testCount).isEqualTo(expectedTestCount);
     }
 
     private void checkTestCase(String className, String methodName) {
-        TestCase testCase = jUnitTest.findRequest(className + "#" + methodName);
-        assertThat(testCase).isNotNull();
-        assertThat(testCase.exists()).isTrue();
-        assertThat(testCase.description()).isEqualTo(className + "#" + methodName);
-        int testCount = testCase.request().getRunner().testCount();
+        Request request = jUnitTest.findRequest(className + "#" + methodName);
+        assertThat(request).isNotNull();
+        Runner runner = request.getRunner();
+        Description description = runner.getDescription();
+        assertThat(description.getDisplayName()).isEqualTo(className);
+        assertThat(description.getChildren().get(0).getDisplayName()).startsWith(methodName);
+        int testCount = runner.testCount();
         assertThat(testCount).isEqualTo(1);
     }
 }
