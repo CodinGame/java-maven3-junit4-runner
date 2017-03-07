@@ -2,15 +2,18 @@
 compilationExitCode=0
 executionExitCode=0
 
-cd /project/answer
+JARS_DIR="/project/target/jars"
+WORKSPACE_DIR="/project/workspace"
 
-classpath=$(echo /project/target/*.jar | tr ' ' ':')
+cd ${CG_RUN_DIR}
 
-find * -name "*.java" -print0 | xargs -0 /usr/src/codingame/java-compiler/cgjavac -Xlint:all -cp "$classpath" -d /project/workspace
+classpath=$(echo ${JARS_DIR}/*.jar | tr ' ' ':')
+
+find * -name "*.java" -print0 | xargs -0 /usr/src/codingame/java-compiler/cgjavac -Xlint:all -cp "$classpath" -d "${WORKSPACE_DIR}"
 compilationExitCode=$?
 
 if [ $compilationExitCode -eq 0 ]; then
-	java -cp "/project/workspace:$classpath:/usr/src/codingame/junit-runner/junit-runner.jar" com.codingame.codemachine.runner.junit.JUnitTestListRunner $*
+	java -cp "${WORKSPACE_DIR}:$classpath:/usr/src/codingame/junit-runner/junit-runner.jar" com.codingame.codemachine.runner.junit.JUnitTestListRunner $*
 else
 	exit $compilationExitCode
 fi
