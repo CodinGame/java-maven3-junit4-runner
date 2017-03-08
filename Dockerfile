@@ -1,4 +1,4 @@
-FROM codingame/maven3-builder
+FROM codingame/maven3-builder:1.0
 
 # Copy files
 COPY target/java-maven3-junit4-runner-0.0.1-SNAPSHOT-jar-with-dependencies.jar /usr/src/codingame/junit-runner/junit-runner.jar
