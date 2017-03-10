@@ -3,5 +3,5 @@ echo "=> Building the junit runner jar file"
 docker run \
     -v $(pwd):/usr/src/junit-runner \
     -w /usr/src/junit-runner \
-    maven:3 \
+    maven:3-alpine \
     mvn clean package
