@@ -11,7 +11,7 @@ To use this runner for your project, edit the `codingame.yml` file and add the f
 
     runner:
       name: codingame/java-maven3-junit4-runner
-      version: 1.1.0-java-8
+      version: 1.1.1-java-8
 
 ## Example
 
