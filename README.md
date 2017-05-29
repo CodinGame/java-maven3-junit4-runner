@@ -9,7 +9,7 @@ At each play, it compiles user's answer using `javac` and run the specified test
 
 To use this runner for your project, edit the `codingame.yml` file and add the following lines to your project:
 
-    runner: techio/java-maven3-junit4-runner:1.1.1-java-8
+    runner: techio/java-maven3-junit4-runner:1.1.3-java-8
 
 ## Example
 
