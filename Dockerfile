@@ -1,4 +1,4 @@
-FROM techio/maven3-builder:1.3
+FROM techio/maven3-builder:1.4
 
 ENV TECHIO_RUN_DIR /project/answer
 
