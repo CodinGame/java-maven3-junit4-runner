@@ -5,7 +5,7 @@ executionExitCode=0
 JARS_DIR="/project/target/jars"
 WORKSPACE_DIR="/project/workspace"
 
-cd ${CG_RUN_DIR}
+cd ${TECHIO_RUN_DIR}
 
 classpath=$(echo ${JARS_DIR}/*.jar | tr ' ' ':')
 
