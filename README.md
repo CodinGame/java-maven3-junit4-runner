@@ -2,12 +2,12 @@
 
 First, this runner compiles the project and generate all jars (project + dependencies).
 
-At each play, it compiles user's answer using `javac` and run the specified testcase using junit4.
+At each play, it compiles the user's answer using `javac` and run the specified test case using JUnit 4.
 
 
 # How to Use
 
-To use this runner for your project, edit the `codingame.yml` file and add the following lines to your project:
+To use this runner for your project, edit the `techio.yml` file and add the following lines to your project:
 
     runner: techio/java-maven3-junit4-runner:1.1.4-java-8
 
@@ -17,19 +17,18 @@ To use this runner for your project, edit the `codingame.yml` file and add the f
 
 ```
 .
-├── about.md
-├── codingame.yml
+├── techio.yml
 ├── markdowns
 │   └── <YOUR_LESSONS>.md
 └── projects
-    └── example                    #Your project root
+    └── example                    # Your project root
         ├── src/main/java
-        │   └── Example.java       #The stub provided to the user
+        │   └── Example.java       # The stub provided to the user
         └── src/test/java
-            └── ExampleTest.java   #Your JUnitTest Class
+            └── ExampleTest.java   # Your JUnitTest Class
 ```
 
-**In your CS project:**
+**In your java project**
 
 *Example.java*
 ```java
@@ -63,7 +62,7 @@ public class ExampleTest {
 }
 ```
 
-**In your lesson:**
+**In your lesson**
 ```md
-@[Fix the following code so that the function DoSum returns a sum of integer]({"stubs": ["src/main/java/Example.java"],"command": "ExampleTest#testSum"})
+@[Fix the following code so that the method sum() returns a sum of the integers passed as parameters]({"stubs": ["src/main/java/Example.java"],"command": "ExampleTest#testSum"})
 ```
