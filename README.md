@@ -64,5 +64,5 @@ public class ExampleTest {
 
 **In your lesson**
 ```md
-@[Fix the following code so that the method sum() returns a sum of the integers passed as parameters]({"stubs": ["src/main/java/Example.java"],"command": "ExampleTest#testSum"})
+@[Fix the method sum() to have it return a sum of the integers passed as parameters]({"stubs": ["src/main/java/Example.java"],"command": "ExampleTest#testSum"})
 ```
